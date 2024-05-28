@@ -1,5 +1,4 @@
-# OTA
-# Required Setting
+# OTA\nRequired Setting
 
 ## for broker server (in OTA Server)
     -	Download and install mosquitto from Windows and mac from Internet
