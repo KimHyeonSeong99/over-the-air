@@ -36,8 +36,8 @@ def update_choice():
     OTA_UI = Tk()
     later_time = StringVar()
     OTA_UI.title("Choice update")
-    window_width = OTA_UI.winfo_width()
-    window_height = OTA_UI.winfo_height()
+    window_width = OTA_UI.winfo_screenwidth()
+    window_height = OTA_UI.winfo_screenheight()
     app_width = 500
     app_height = 300
     width_center = int((window_width - app_width)/2)
