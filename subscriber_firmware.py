@@ -114,4 +114,3 @@ client.on_message = on_message
 client.connect(brokerIp, port, 60)
 
 client.loop_forever()
-
