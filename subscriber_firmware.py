@@ -33,18 +33,17 @@ def compute_file_hash(file_path):
     return sha256_hash.hexdigest()
 
 def update_choice():
-    later_time = StringVar()
     OTA_UI = Tk()
+    later_time = StringVar()
     OTA_UI.title("Choice update")
     window_width = OTA_UI.winfo_width()
     window_height = OTA_UI.winfo_height()
-    app_width = 300
-    app_height = 500
+    app_width = 500
+    app_height = 300
     width_center = int((window_width - app_width)/2)
     height_center = int((window_height - app_height)/2)
     OTA_UI.geometry(f"{app_width}x{app_height}+{width_center}+{height_center}")
     information = Label(OTA_UI,text = 'Do you want to update new firmware?\nclick the button what you want',font = ('bold'))
-    button_Submit = Button(OTA_UI,text = 'Submit',command = event_PB)
     
     def event_PB():
         if later_time.get() == 'Now':
@@ -54,9 +53,10 @@ def update_choice():
         elif later_time.get() == '':
             messagebox.showinfo("Notice","You choice Now, Start install firmware!")
         else:
-            messagebox.showinfo(f"You choice Later, Notice update after {later_time.get()} later!")
+            messagebox.showinfo("Notice",f"You choice Later, Notice update after {later_time.get()} later!")
             OTA_UI.destroy()
-    
+            
+    button_Submit = Button(OTA_UI,text = 'Submit',command = event_PB)
     Later_time0 = Radiobutton(OTA_UI, text = 'Now', value = 'Now', variable = later_time)
     Later_time1 = Radiobutton(OTA_UI, text = '10min', value = '10min', variable = later_time)
     Later_time2 = Radiobutton(OTA_UI, text = '1hour', value = '1hour', variable = later_time)
@@ -76,7 +76,7 @@ def update_choice():
 def on_message(client, userdata, msg):
 
     try:
-        with open("/home/sea/OTA/version.json","r") as versionlist:
+        with open("/home/avees/OTA/version.json","r") as versionlist:
             version = json.load(versionlist)    
     except:
         pass
@@ -89,6 +89,7 @@ def on_message(client, userdata, msg):
         flag = 1
         while(flag):
             flag = update_choice()
+            time.sleep(flag)
 
         try:
             firmwareDirectory = '/home/avees/OTA/tmp'
