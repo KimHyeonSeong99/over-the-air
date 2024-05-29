@@ -63,8 +63,7 @@ def on_message(client, userdata, msg):
     else:
         print("Deny downloading new firmware")
     
-    os.chdir("/home/sea/sea-me-hackathon-2023/Cluster/src")
-    os.system("make -j6")
+
     print("Ready for a new update")
 
 

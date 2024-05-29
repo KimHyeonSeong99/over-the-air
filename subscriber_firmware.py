@@ -11,7 +11,9 @@ import io
 import time
 from tkinter import *
 from tkinter import messagebox
+import someip
 
+timelist = {'Now':0,'10min':600,'1hour':3600,'1day':86400,'1week':604800}
 Sub_Topic = "updates/firmware" 
 userId = "Alice"
 userPw = "mose"
@@ -32,36 +34,43 @@ def compute_file_hash(file_path):
 
 def update_choice():
     later_time = StringVar()
-    while(later_time.get() != 'Now'):
-        OTA_UI = Tk()
-        OTA_UI.title("Choice update")
-        information = Label(OTA_UI,text = 'Do you want to update new firmware?\nclick the button what you want',font = (20,'bold'))
-        button_Submit = Button(OTA_UI,text = 'Submit',command = event_PB)
-        Later_time0 = Radiobutton(OTA_UI, text = 'Now', value = 'Now', variable = later_time)
-        Later_time1 = Radiobutton(OTA_UI, text = '10min', value = '600', variable = later_time)
-        Later_time2 = Radiobutton(OTA_UI, text = '1hour', value = '3600', variable = later_time)
-        Later_time3 = Radiobutton(OTA_UI, text = '1day', value = '86400', variable = later_time)
-        Later_time4 = Radiobutton(OTA_UI, text = '1week', value = '509000', variable = later_time) 
-        information.pack()
-        button_Submit.pack()
-        Later_time0.pack()
-        Later_time1.pack()
-        Later_time2.pack()
-        Later_time3.pack()
-        Later_time4.pack()
-        OTA_UI.mainloop()
-        time.sleep(later_time.get())
-
+    OTA_UI = Tk()
+    OTA_UI.title("Choice update")
+    window_width = OTA_UI.winfo_width()
+    window_height = OTA_UI.winfo_height()
+    app_width = 300
+    app_height = 500
+    width_center = int((window_width - app_width)/2)
+    height_center = int((window_height - app_height)/2)
+    OTA_UI.geometry(f"{app_width}x{app_height}+{width_center}+{height_center}")
+    information = Label(OTA_UI,text = 'Do you want to update new firmware?\nclick the button what you want',font = ('bold'))
+    button_Submit = Button(OTA_UI,text = 'Submit',command = event_PB)
+    
     def event_PB():
         if later_time.get() == 'Now':
-            messagebox.showinfo("You choice Now, Start install firmware!")
+            messagebox.showinfo("Notice","You choice Now, Start install firmware!")
+            OTA_UI.destroy()
+
+        elif later_time.get() == '':
+            messagebox.showinfo("Notice","You choice Now, Start install firmware!")
         else:
-            messagebox.showinfo(f"You choice Later, Notice update after {(int(later_time.get())/3600)}hours later!")
-        OTA_UI.destroy()
-
-        
-
-
+            messagebox.showinfo(f"You choice Later, Notice update after {later_time.get()} later!")
+            OTA_UI.destroy()
+    
+    Later_time0 = Radiobutton(OTA_UI, text = 'Now', value = 'Now', variable = later_time)
+    Later_time1 = Radiobutton(OTA_UI, text = '10min', value = '10min', variable = later_time)
+    Later_time2 = Radiobutton(OTA_UI, text = '1hour', value = '1hour', variable = later_time)
+    Later_time3 = Radiobutton(OTA_UI, text = '1day', value = '1day', variable = later_time)
+    Later_time4 = Radiobutton(OTA_UI, text = '1week', value = '1week', variable = later_time)
+    information.pack()
+    button_Submit.pack()
+    Later_time0.pack()
+    Later_time1.pack()
+    Later_time2.pack()
+    Later_time3.pack()
+    Later_time4.pack()
+    OTA_UI.mainloop()
+    return timelist.get(later_time.get())
 
 # subscriber callback
 def on_message(client, userdata, msg):
@@ -76,14 +85,13 @@ def on_message(client, userdata, msg):
     FileName = payload['FileName']
     FirmwareData = payload['Firmware']
     FirmwareVersion = payload['Version']
-    firmwareDirectory = '/home/sea/OTA/tmp/'
-    firmwarePath = os.path.join(firmwareDirectory, FileName)
     if float(version[FileName]) < float(FirmwareVersion):
-        with open(firmwarePath,"w") as stream:
-            stream.write(FirmwareData)
-        update_choice()    
+        flag = 1
+        while(flag):
+            flag = update_choice()
+
         try:
-            firmwareDirectory = '/home/sea/sea-me-hackathon-2023/Cluster/src/'
+            firmwareDirectory = '/home/avees/OTA/tmp'
             firmwarePath = os.path.join(firmwareDirectory, FileName)
             with open(firmwarePath,"w") as stream:
                 stream.write(FirmwareData) 
@@ -94,10 +102,27 @@ def on_message(client, userdata, msg):
             print(f"firmwareDirectory: {firmwareDirectory}")
             print(f"firmwarePath: {firmwarePath}")
 
-        os.chdir("/home/sea/sea-me-hackathon-2023/Cluster/src")
-        os.system("make -j6")
+        app = someip.Application(0x1234)  # 이 값은 서비스 ID로 실제 사용하는 ID로 대체해야 합니다.
+                
+        service_id = 0x5678  # 수신측에서 사용하는 서비스 ID
+
+        # 파일을 열고 내용을 읽음
+        with open(firmwareDirectory, 'rb') as file:
+                file_data = file.read()               
+            # 데이터를 패킷으로 분할하여 전송
+        chunk_size = 1024  # 한 번에 전송할 데이터의 크기
+        num_chunks = (len(file_data) + chunk_size - 1) // chunk_size  # 파일을 패킷으로 나눔
+        
+        message = someip.Packet(0xFFFF, service_id, someip.MsgType.NOTIFY, someip.ReturnCode.E_OK, FileName)
+        app.send_message(message)
+
+        for i in range(num_chunks):
+            chunk_data = file_data[i * chunk_size: (i + 1) * chunk_size]
+            message = someip.Packet(0xFFFF, service_id, someip.MsgType.NOTIFY, someip.ReturnCode.E_OK, chunk_data)
+            app.send_message(message)
+
         version[FileName] = FirmwareVersion
-        with open("/home/sea/OTA/version.json","w") as versionlist:
+        with open("/home/avees/OTA/version.json","w") as versionlist:
             versionlist.write(json.dumps(version))
     else:
         print("new firmware version is old version, pass the update")

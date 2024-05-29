@@ -3,6 +3,7 @@ import json
 import hashlib
 import os, time
 
+
 Sub_Topic = "updates/firmware"
 userId = "Alice"
 userPw = "mose"
@@ -18,7 +19,6 @@ file_list = dict()
 def check_new_firmware():
     diff = []
     remove_dict_list =[]
-    remove_file_list=[]
     now_file_list = os.listdir(update_firmware_path)
     for firmware in now_file_list:
         if firmware not in file_list:
