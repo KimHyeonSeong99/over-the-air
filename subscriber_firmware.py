@@ -10,6 +10,7 @@ import base64
 import io
 import time
 from tkinter import *
+from tkinter import messagebox
 
 Sub_Topic = "updates/firmware" 
 userId = "Alice"
@@ -29,10 +30,38 @@ def compute_file_hash(file_path):
             sha256_hash.update(chunk)
     return sha256_hash.hexdigest()
 
-def event_PB_Now():
-    global choice
-    choice = 'yes'
-    
+def update_choice():
+    later_time = IntVar()
+    later_time = 1
+    while(later_time.get()):
+        OTA_UI = Tk()
+        OTA_UI.title("Choice update")
+        information = Label(OTA_UI,text = 'Do you want to update new firmware?\nclick the button what you want',font = (20,'bold'))
+        button_Submit = Button(OTA_UI,text = 'Submit',command = event_PB)
+        Later_time0 = Radiobutton(OTA_UI, text = 'Now', value = 0, variable = later_time)
+        Later_time1 = Radiobutton(OTA_UI, text = '10min', value = 600, variable = later_time)
+        Later_time2 = Radiobutton(OTA_UI, text = '1hour', value = 3600, variable = later_time)
+        Later_time3 = Radiobutton(OTA_UI, text = '1day', value = 86400, variable = later_time)
+        Later_time4 = Radiobutton(OTA_UI, text = '1week', value = 509000, variable = later_time) 
+        information.pack()
+        button_Submit.pack()
+        Later_time0.pack()
+        Later_time1.pack()
+        Later_time2.pack()
+        Later_time3.pack()
+        Later_time4.pack()
+        OTA_UI.mainloop()
+        time.sleep(later_time.get())
+
+    def event_PB():
+        if later_time.get() == 0:
+            messagebox.showinfo("You choice Now, Start install firmware!")
+        else:
+            messagebox.showinfo(f"You choice Later, Notice update after {(later_time.get()/3600)}hours later!")
+        OTA_UI.destroy()
+
+        
+
 
 
 # subscriber callback
@@ -53,20 +82,7 @@ def on_message(client, userdata, msg):
     if float(version[FileName]) < float(FirmwareVersion):
         with open(firmwarePath,"w") as stream:
             stream.write(FirmwareData)
-        
-        later_time = IntVar()
-        later_time = 1
-        while(later_time):
-            OTA_UI = Tk()
-            OTA_UI.title("Choice update")
-            information = Label(OTA_UI,text = 'Do you want to update new firmware?\nclick the button what you want',font = (20,'bold'))
-            button_Submit = Button(OTA_UI,text = 'Submit',command = event_PB)
-            Later_time0 = Radiobutton(OTA_UI, text = 'Now', value = 0, variable = later_time)
-            Later_time1 = Radiobutton(OTA_UI, text = '10min', value = 600, variable = later_time)
-            Later_time1 = Radiobutton(OTA_UI, text = '1hour', value = 3600, variable = later_time)
-            Later_time1 = Radiobutton(OTA_UI, text = '1day', value = 86400, variable = later_time)
-            Later_time1 = Radiobutton(OTA_UI, text = '1week', value = 509000, variable = later_time)
-
+        update_choice()    
         try:
             firmwareDirectory = '/home/sea/sea-me-hackathon-2023/Cluster/src/'
             firmwarePath = os.path.join(firmwareDirectory, FileName)
@@ -98,4 +114,3 @@ client.on_message = on_message
 client.connect(brokerIp, port, 60)
 
 client.loop_forever()
-
