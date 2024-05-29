@@ -56,7 +56,7 @@ def on_message(client, userdata, msg):
         
         later_time = IntVar()
         later_time = 1
-        while(later_time)
+        while(later_time):
             OTA_UI = Tk()
             OTA_UI.title("Choice update")
             information = Label(OTA_UI,text = 'Do you want to update new firmware?\nclick the button what you want',font = (20,'bold'))
