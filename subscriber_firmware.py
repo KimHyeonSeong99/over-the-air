@@ -31,18 +31,17 @@ def compute_file_hash(file_path):
     return sha256_hash.hexdigest()
 
 def update_choice():
-    later_time = IntVar()
-    later_time = 1
-    while(later_time.get()):
+    later_time = StringVar()
+    while(later_time.get() != 'Now'):
         OTA_UI = Tk()
         OTA_UI.title("Choice update")
         information = Label(OTA_UI,text = 'Do you want to update new firmware?\nclick the button what you want',font = (20,'bold'))
         button_Submit = Button(OTA_UI,text = 'Submit',command = event_PB)
-        Later_time0 = Radiobutton(OTA_UI, text = 'Now', value = 0, variable = later_time)
-        Later_time1 = Radiobutton(OTA_UI, text = '10min', value = 600, variable = later_time)
-        Later_time2 = Radiobutton(OTA_UI, text = '1hour', value = 3600, variable = later_time)
-        Later_time3 = Radiobutton(OTA_UI, text = '1day', value = 86400, variable = later_time)
-        Later_time4 = Radiobutton(OTA_UI, text = '1week', value = 509000, variable = later_time) 
+        Later_time0 = Radiobutton(OTA_UI, text = 'Now', value = 'Now', variable = later_time)
+        Later_time1 = Radiobutton(OTA_UI, text = '10min', value = '600', variable = later_time)
+        Later_time2 = Radiobutton(OTA_UI, text = '1hour', value = '3600', variable = later_time)
+        Later_time3 = Radiobutton(OTA_UI, text = '1day', value = '86400', variable = later_time)
+        Later_time4 = Radiobutton(OTA_UI, text = '1week', value = '509000', variable = later_time) 
         information.pack()
         button_Submit.pack()
         Later_time0.pack()
@@ -54,10 +53,10 @@ def update_choice():
         time.sleep(later_time.get())
 
     def event_PB():
-        if later_time.get() == 0:
+        if later_time.get() == 'Now':
             messagebox.showinfo("You choice Now, Start install firmware!")
         else:
-            messagebox.showinfo(f"You choice Later, Notice update after {(later_time.get()/3600)}hours later!")
+            messagebox.showinfo(f"You choice Later, Notice update after {(int(later_time.get())/3600)}hours later!")
         OTA_UI.destroy()
 
         
