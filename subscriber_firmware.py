@@ -139,3 +139,54 @@ client.on_message = on_message
 client.connect(brokerIp, port, 60)
 
 client.loop_forever()
+
+import os
+
+# 서비스 ID 설정
+SERVICE_ID = 0x1234
+METHOD_ID = 0x5678
+PAYLOAD_MAX_SIZE = 1024  # 메시지의 최대 크기 (바이트 단위)
+
+# 서비스 디스커버리 클라이언트 생성
+sd_client = ServiceDiscoveryClient()
+
+# vSomeIP Tester 생성
+tester = SomeIpTester()
+
+def send_file(file_path):
+    # 파일 읽기
+    with open(file_path, 'rb') as file:
+        file_data = file.read()
+
+    # 파일 크기 확인
+    file_size = os.path.getsize(file_path)
+
+    # 파일을 보낼 수 있는 패킷 수 계산
+    num_packets = (file_size + PAYLOAD_MAX_SIZE - 1) // PAYLOAD_MAX_SIZE
+
+    # 파일을 패킷으로 나누어 전송
+    for i in range(num_packets):
+        # 현재 패킷의 시작 및 끝 오프셋 계산
+        start_offset = i * PAYLOAD_MAX_SIZE
+        end_offset = min((i + 1) * PAYLOAD_MAX_SIZE, file_size)
+
+        # 현재 패킷의 데이터 추출
+        packet_data = file_data[start_offset:end_offset]
+
+        # vSomeIP 메시지 생성
+        payload = packet_data
+        response = tester.send_request(SERVICE_ID, METHOD_ID, payload)
+
+        # 응답 확인
+        if not response:
+            print("No response received for packet {}.".format(i + 1))
+            return False
+
+    print("File successfully sent.")
+    return True
+
+
+file_path = 'example.txt'
+
+send_file(file_path)
+

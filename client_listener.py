@@ -1,24 +1,31 @@
-import someip
+
 import os
+import socket
+file_path = '/home/sea/sea-me-hackathon-2023/Cluster/src/'
 
-# vSomeIP 통신 설정
-app = someip.Application(0x5678)  # 서비스 ID로 전송 측과 동일한 값을 사용해야 합니다.
-
-# 파일을 수신하는 함수 정의
-def receive_file(file_directory):
-    # 데이터를 수신하고 파일로 저장
-    file_path = file_directory + app.receive_message().payload
-    with open(file_path, 'wb') as file:
-        while True:
-            message = app.receive_message()
-            if not message:
-                break
-            file.write(message.payload)
-
-# 파일 수신 실행
-file_directory = '/home/sea/sea-me-hackathon-2023/Cluster/src/'  # 수신한 파일을 저장할 경로
-receive_file(file_directory)
-os.chdir('/home/sea/sea-me-hackathon-2023/Cluster/src/')
-os.system("make -j6")
+def receive_file(server_host, server_port, buffer_size=4096):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+        server_socket.bind((server_host, server_port))
+        server_socket.listen(1)
+        print(f"Server listening on {server_host}:{server_port}")
+        
+        conn, addr = server_socket.accept()
+        file_name = conn.recv()
+        with conn:
+            print(f"Connected by {addr}")
+            with open(file_path + file_name, "wb") as f:
+                while True:
+                    data = conn.recv(buffer_size)
+                    if not data:
+                        break
+                    f.write(data)
+            print("File received successfully.")
 
 
+server_host = "0.0.0.0"  # Listen on all interfaces
+server_port = 12345
+
+while True:
+    receive_file(server_host, server_port)
+    os.chdir('/home/sea/sea-me-hackathon-2023/Cluster/src/')
+    os.system("make -j6")
