@@ -1,5 +1,10 @@
 # OTA Required Setting
 
+## Used py
+    - OTA_publisher.py
+    - OTA_subscriber.py
+    - client_listner.py
+    
 ## for broker server (in OTA Server)
     -	Download and install mosquitto from Windows and mac from Internet
     -	Use the command 'sudo apt install mosquitto mosquitto-clients' in Linux terminal for download mosquitto
