@@ -74,9 +74,9 @@ def on_message(client, userdata, msg):
 
     try:
         with open("/home/avees/OTA/version.json","r") as versionlist:
-            version = json.load(versionlist)    
+            version = json.load(versionlist) 
     except:
-        pass
+        version = dict()
 
     payload = json.loads(msg.payload)
     FileName = payload['FileName']

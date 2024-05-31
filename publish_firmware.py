@@ -66,7 +66,7 @@ def check_new_firmware():
 
 def make_json(FilePath):
     firmware = dict()
-    FileName = FilePath.split('/')[-1]
+    FileName = os.path.basename(FilePath)
     NamePart = FileName.split('-')
     try:
         with open(FilePath,'r',encoding='utf-8') as file:
