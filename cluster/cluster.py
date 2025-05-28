@@ -115,10 +115,10 @@ class ClusterWindow(QMainWindow):
 		except can.CanError as e:
 			print(f"Error initializing CAN interface: {e}")
 			sys.exit(1)
+		self.ota_msg = []
+		self.counter = 0
 		
-		self.setFocusPolicy(Qt.StrongFocus)  # 메인 윈도우가 키 이벤트를 받도록 설정
-		self.central_widget.setFocusPolicy(Qt.NoFocus)  # (선택) central widget이 포커스를 가로채지 않도록
-		
+
 	def update_infomation(self):
 		self.can_receive_event()  # Fetch CAN data before updating the UI
 		self.speed_label.setText(f"{self.current_speed} km/h")
@@ -158,9 +158,39 @@ class ClusterWindow(QMainWindow):
 					self.current_rpm = min((msg.data[6] << 8) | msg.data[7], 8000)
 				elif can_id == 101:
 					self.current_speed = msg.data[5]  # Corrected indexing for speed
+				elif can_id == 0x34:
+					self.ota_msg = []  #init array
+					self.counter = 0
+					positive_response = bytes([0x00, 0x07])
+					self.can.send(can.Message(arbitration_id=0x74, data=positive_response, is_extended_id=False))
+				elif can_id == 0x36:  # Check if the message is from the isotp stack
+					self.ota_msg.append((msg.data[0] + (256 * self.counter), msg.data[1:]))
+					if msg.data[0] >= 0xFF:
+						if len(self.ota_msg) == (256 * (self.counter + 1)):
+							self.can.send(can.Message(arbitration_id=0x76, data=[0x10],is_extended_id=False))  # Send positive response
+							self.counter += 1
+						else:
+							self.can.send(can.Message(arbitration_id=0x76, data=[0x11], is_extended_id=False))
+							self.ota_msg[256 * self.counter:] = []
+
+				elif can_id == 0x37:  # Check if the message is from the isotp stack
+					if self.ota_msg:
+						ids = max([seq for seq, _ in self.ota_msg[256 * self.counter:]])
+						if len(self.ota_msg) == ids + 1:
+							new_file = b"".join(data for _, data in sorted(self.ota_msg, key=lambda x: x[0]))
+							with open("firmware_received.bin", "wb") as f:
+								f.write(new_file)
+							self.can.send(can.Message(arbitration_id=0x76, data=[0x10], is_extended_id=False))
+							self.can.send(can.Message(arbitration_id=0x77, data=[0x10], is_extended_id=False))
+						else:
+							self.can.send(can.Message(arbitration_id=0x76, data=[0x11], is_extended_id=False))
+							self.ota_msg[256 * self.counter:] = []
+					else:
+						self.can.send(can.Message(arbitration_id=0x77, data=[0x11], is_extended_id=False))
+
 		except Exception as e:
 			print(f"CAN receive error: {e}")  # Log any errors
-		
+
 	def update_logo(self, text):
 		self.text_label.setText(text)
 	 
