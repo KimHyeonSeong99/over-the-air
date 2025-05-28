@@ -5,6 +5,9 @@ import time
 import requests
 
 program_dir = os.path.dirname(os.path.abspath(__file__))
+broker_ip = "mqtt_broker_ip"  # Replace with your MQTT broker IP
+broker_port = 1883  # Replace with your MQTT broker port
+subscribe_topics = ["cluster"]
 
 def send_ota_file(can_bus, filepath, block_size=7*256):
     with open(filepath, "rb") as f:
@@ -74,6 +77,7 @@ def on_message(client, userdata, message):
     # 메시지에서 파일명 추출 (예: payload가 파일명)
     filename = message.payload.decode().strip()
     server_url = "http://server_ip:port/files"  # 파일 서버의 URL (폴더 경로까지)
+    os.makedirs(os.path.join(program_dir, "files"), exist_ok=True)
     local_path = os.path.join(program_dir,"files/firmware.bin")
     if download_file_from_server(server_url, filename, local_path):
         send_ota_file(can_bus, local_path)
@@ -82,6 +86,7 @@ if __name__ == "__main__":
     can_bus = can.interface.Bus(channel='can0', bustype='socketcan')
     client = mqtt.Client()
     client.on_message = on_message
-    client.connect("mqtt_broker_ip", 1883, 60)
-    client.subscribe("ota/firmware")
+    client.connect(broker_ip, broker_port, 60)
+    for topic in subscribe_topics:
+        client.subscribe(topic)
     client.loop_forever()
