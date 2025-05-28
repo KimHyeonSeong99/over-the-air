@@ -137,7 +137,7 @@ class ClusterWindow(QMainWindow):
 			 
 	def can_receive_event(self):
 		try:
-			msg = self.can.recv()  # Non-blocking or short timeout
+			msg = self.can.recv(timeout=0.01)  # timeout 추가 (0.01초)
 			if msg is not None:
 				can_id = msg.arbitration_id
 				if can_id == 99:
