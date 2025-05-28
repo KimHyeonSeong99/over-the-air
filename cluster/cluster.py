@@ -1,13 +1,15 @@
 import sys
+import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QWidget
 from PyQt5.QtGui import QFont, QPainter, QColor, QPen, QPixmap
 from PyQt5.QtCore import QTimer, Qt, QRectF
-import can 
+import can
 
 width = 800
 height = 480
 gauge_size = int(250 * width/800)
 position = int(40 * width/800)
+program_dir = os.path.dirname(os.path.abspath(__file__))
 
 class SpeedProgress(QWidget):
 	def __init__(self, parent=None):
@@ -64,7 +66,7 @@ class ClusterWindow(QMainWindow):
 		self.setCentralWidget(self.central_widget)
 
 		self.background_label = QLabel(self.central_widget)
-		self.background_pixmap = QPixmap("/home/user/OTA/cluster/back.png")
+		self.background_pixmap = QPixmap(os.path.join(program_dir, "image/back.png"))
 		self.background_label.setPixmap(self.background_pixmap.scaled(int(800 * width/800), int(480 * height/480)))
 		self.background_label.setGeometry(0, 0, int(800 * width/800), int(480 * height/480))
 
@@ -90,7 +92,7 @@ class ClusterWindow(QMainWindow):
 		self.rpm_multiple_label.move(width - position - gauge_size, position - int(15 * width/800))
 
 		self.logo_label = QLabel(self.central_widget)
-		self.logo_pixmap = QPixmap("/home/user/OTA/cluster/volk.png")
+		self.logo_pixmap = QPixmap(os.path.join(program_dir, "image/volk.png"))
 		self.logo_label.setPixmap(self.logo_pixmap.scaled(int(150 * width/800), int(150 * width/800), Qt.KeepAspectRatio))
 		self.logo_label.setAlignment(Qt.AlignCenter)
 		self.logo_label.move(int(width - 150 * width/800) // 2, position)
