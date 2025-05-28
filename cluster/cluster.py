@@ -116,6 +116,9 @@ class ClusterWindow(QMainWindow):
 			print(f"Error initializing CAN interface: {e}")
 			sys.exit(1)
 		
+		self.setFocusPolicy(Qt.StrongFocus)  # 메인 윈도우가 키 이벤트를 받도록 설정
+		self.central_widget.setFocusPolicy(Qt.NoFocus)  # (선택) central widget이 포커스를 가로채지 않도록
+		
 	def update_infomation(self):
 		self.can_receive_event()  # Fetch CAN data before updating the UI
 		self.speed_label.setText(f"{self.current_speed} km/h")
