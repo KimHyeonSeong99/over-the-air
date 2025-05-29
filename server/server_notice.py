@@ -3,6 +3,7 @@ import paho.mqtt.client as Client
 
 broker_ip = "127.0.0.1"
 broker_port = 1883
+os.makedirs('firmware', exist_ok=True)  # Ensure firmware directory exists
 
 def publish_message(broker_address, topic, message,port):
     client = Client()
@@ -29,8 +30,6 @@ def publish_notion(broker_address, topic, port=1883):
     # Write updated firmware list back to file
     with open('firmware_list.txt', 'w') as file:
         file.write('\n'.join(firmware_list))
-
-
 
 
 if __name__ == "__main__":
