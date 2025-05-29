@@ -1,5 +1,5 @@
 import os
-import paho.mqtt.client as Client
+from paho.mqtt.client import Client
 
 broker_ip = "127.0.0.1"
 broker_port = 1883
