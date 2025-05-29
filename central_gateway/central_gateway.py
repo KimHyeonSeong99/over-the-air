@@ -82,7 +82,6 @@ def on_message(client, userdata, message):
     os.makedirs(os.path.join(program_dir, "files"), exist_ok=True)
     local_zip_path = os.path.join(program_dir, "files/firmware.zip")
     if download_file_from_server(server_url, filename, local_zip_path):
-        import zipfile
         with zipfile.ZipFile(local_zip_path, 'r') as zip_ref:
             zip_ref.extractall(os.path.join(program_dir, "files"))
         bin_path = os.path.join(program_dir, "files", filename.replace('.zip', '.bin'))  # 파일명에 따라 처리
