@@ -84,6 +84,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, message):
     filename = message.payload.decode().strip()
+    print(f"Received message on topic {message.topic}: {filename}")
     server_url = f"http://{broker_ip}:5000/get_update?filename={filename}"  # 파라미터명 수정
     os.makedirs(os.path.join(program_dir, "files"), exist_ok=True)
     local_zip_path = os.path.join(program_dir, "files/firmware.zip")
