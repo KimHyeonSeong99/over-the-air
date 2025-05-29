@@ -3,6 +3,7 @@ import can
 import paho.mqtt.client as mqtt
 import time
 import requests
+import zipfile
 
 program_dir = os.path.dirname(os.path.abspath(__file__))
 broker_ip = "mqtt_broker_ip"  # Replace with your MQTT broker IP
@@ -74,14 +75,20 @@ def download_file_from_server(server_url, filename, save_path):
         return False
 
 def on_message(client, userdata, message):
-    # 메시지에서 파일명 추출 (예: payload가 파일명)
     filename = message.payload.decode().strip()
-    server_url = "http://server_ip:port/files"  # 파일 서버의 URL (폴더 경로까지)
+    server_url = f"http://{broker_ip}:5000/get_update?filename={filename}"  # 파라미터명 수정
     os.makedirs(os.path.join(program_dir, "files"), exist_ok=True)
-    local_path = os.path.join(program_dir,"files/firmware.bin")
-    if download_file_from_server(server_url, filename, local_path):
-        send_ota_file(can_bus, local_path)
-    
+    local_zip_path = os.path.join(program_dir, "files/firmware.zip")
+    if download_file_from_server(server_url, filename, local_zip_path):
+        import zipfile
+        with zipfile.ZipFile(local_zip_path, 'r') as zip_ref:
+            zip_ref.extractall(os.path.join(program_dir, "files"))
+        bin_path = os.path.join(program_dir, "files", filename.replace('.zip', '.bin'))  # 파일명에 따라 처리
+        if os.path.exists(bin_path):
+            send_ota_file(can_bus, bin_path)
+        else:
+            print(f"{bin_path} not found in the zip file.")
+
 if __name__ == "__main__":
     can_bus = can.interface.Bus(channel='can0', bustype='socketcan')
     client = mqtt.Client()
