@@ -76,6 +76,12 @@ def download_file_from_server(server_url, filename, save_path):
         print(f"Failed to download file: {filename}")
         return False
 
+def on_connect(client, userdata, flags, rc):
+    print(f"Connected with result code {rc}")
+    for topic in subscribe_topics:
+        client.subscribe(topic)
+    print(f"Subscribed to topics: {subscribe_topics}")
+
 def on_message(client, userdata, message):
     filename = message.payload.decode().strip()
     server_url = f"http://{broker_ip}:5000/get_update?filename={filename}"  # 파라미터명 수정
@@ -93,6 +99,7 @@ def on_message(client, userdata, message):
 if __name__ == "__main__":
     can_bus = can.interface.Bus(channel='can0', bustype='socketcan')
     client = mqtt.Client()
+    client.on_connect = on_connect
     client.on_message = on_message
     client.username_pw_set(user_name, password)
     client.connect(broker_ip, broker_port, 60)

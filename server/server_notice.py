@@ -19,18 +19,21 @@ def publish_notion(broker_address, topic, port=1883):
     # Read firmware list once
     if os.path.exists('firmware_list.txt'):
         with open('firmware_list.txt', 'r') as file:
-            firmware_list = file.read().splitlines()
+            firmware_list = set(file.read().splitlines())
     else:
-        firmware_list = []
+        firmware_list = set()
 
+    new_firmware = []
     for file_name in os.listdir('firmware'):
         if file_name.endswith(".bin") and file_name not in firmware_list:
             publish_message(broker_address, topic, file_name, port)
-            firmware_list.append(file_name)
+            new_firmware.append(file_name)
 
-    # Write updated firmware list back to file
-    with open('firmware_list.txt', 'w') as file:
-        file.write('\n'.join(firmware_list))
+    # Write updated firmware list back to file (누락 없이 누적)
+    if new_firmware:
+        firmware_list.update(new_firmware)
+        with open('firmware_list.txt', 'w') as file:
+            file.write('\n'.join(sorted(firmware_list)))
 
 
 if __name__ == "__main__":
