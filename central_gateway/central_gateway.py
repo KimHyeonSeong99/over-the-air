@@ -65,7 +65,7 @@ def send_ota_file(can_bus, filepath, block_size=7*256):
                 break
 
 def download_file_from_server(server_url, filename, save_path):
-    response = requests.get(f"{server_url}/{filename}", stream=True)
+    response = requests.get(server_url, stream=True)
     if response.status_code == 200:
         with open(save_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
