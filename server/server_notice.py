@@ -10,7 +10,8 @@ def publish_message(broker_address, topic, message,port):
     client.username_pw_set("mose", "mose")
     client.connect(broker_address, port)
     client.loop_start()  # Start the loop to process network events
-    client.publish(topic, message)
+    client.publish(topic, message, retain=True)  # Publish the message with retain flag
+    print(f"Published message: {message} to topic: {topic}")
     client.loop_stop()  # Stop the loop after publishing
     client.disconnect()
 
