@@ -34,4 +34,4 @@ def publish_notion(broker_address, topic, port=1883):
 
 if __name__ == "__main__":
     while True:  # Fixed infinite loop
-        publish_notion(broker_ip, 'ota/update', broker_port)
+        publish_notion(broker_ip, 'cluster', broker_port)
