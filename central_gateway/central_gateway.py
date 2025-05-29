@@ -9,6 +9,8 @@ program_dir = os.path.dirname(os.path.abspath(__file__))
 broker_ip = "mqtt_broker_ip"  # Replace with your MQTT broker IP
 broker_port = 1883  # Replace with your MQTT broker port
 subscribe_topics = ["cluster"]
+user_name = "mose"  # Replace with your MQTT username
+password = "mose"  # Replace with your MQTT password
 
 def send_ota_file(can_bus, filepath, block_size=7*256):
     with open(filepath, "rb") as f:
@@ -93,6 +95,7 @@ if __name__ == "__main__":
     can_bus = can.interface.Bus(channel='can0', bustype='socketcan')
     client = mqtt.Client()
     client.on_message = on_message
+    client.username_pw_set(user_name, password)
     client.connect(broker_ip, broker_port, 60)
     for topic in subscribe_topics:
         client.subscribe(topic)
