@@ -1,5 +1,6 @@
 import os
 from paho.mqtt.client import Client
+import time  # Import time module for sleep
 
 broker_ip = "127.0.0.1"
 broker_port = 1883
@@ -37,5 +38,6 @@ def publish_notion(broker_address, topic, port=1883):
 
 
 if __name__ == "__main__":
-    while True:  # Fixed infinite loop
+    while True:
         publish_notion(broker_ip, 'cluster', broker_port)
+        time.sleep(10)
