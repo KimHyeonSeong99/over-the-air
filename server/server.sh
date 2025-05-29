@@ -12,3 +12,6 @@ EOF
 
 # mosquitto 재시작
 sudo systemctl restart mosquitto
+
+python3 server_notice.py
+python3 server_download.py
