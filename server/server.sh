@@ -15,7 +15,7 @@ EOF
 sudo systemctl restart mosquitto
 
 #install paho-mqtt
-sudo apt-get install python3-pahto-mqtt -y
+sudo apt-get install python3-paho-mqtt -y
 
 #install flask
 sudo apt-get install python3-flask -y
