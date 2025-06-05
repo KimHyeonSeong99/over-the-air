@@ -38,7 +38,6 @@ def publish_notion(broker_address, topic, port=1883):
             file.write('\n'.join(sorted(firmware_list)))
 
 
-
 if __name__ == "__main__":
     while True:
         publish_notion(broker_ip, 'cluster', broker_port)
