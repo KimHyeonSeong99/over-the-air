@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 
+data = os.urandom(1024)
 
 key_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'key')
 if not os.path.exists(key_dir):
@@ -79,7 +80,6 @@ def calculate_generation_time_propose():
     propose_time_list = []
     start_time = time.time()
     for i in tqdm(range(5000)):
-        data = os.urandom(1024)
         target = f"ECU_{i}"
         salt = generate_salt()
         _ = generate_update_packet(data=data, target=target, salt=salt)
@@ -94,7 +94,6 @@ def calculate_generation_time_propose():
 def process_propose_packet(i):
     start = time.time()
 
-    data = os.urandom(1024)
     target = f"ECU_{i}"
     salt = generate_salt()
     _ = generate_update_packet(data=data, target=target, salt=salt)
@@ -117,7 +116,6 @@ def calculate_generation_time_base():
     base_time_list = []
     start_time = time.time()
     for i in tqdm(range(5000)):
-        data = os.urandom(1024)
         target = f"ECU_{i}"
         _ = generate_base_update_packet(data=data, target=target)
         if i % 100 == 0:
@@ -130,7 +128,6 @@ def calculate_generation_time_base():
 def process_base_packet(i):
     start = time.time()
 
-    data = os.urandom(1024)
     target = f"ECU_{i}"
     _ = generate_base_update_packet(data=data, target=target)
 
@@ -152,7 +149,6 @@ def calculate_generation_time_double():
     double_time_list = []
     start_time = time.time()
     for i in tqdm(range(5000)):
-        data = os.urandom(1024)
         target = f"ECU_{i}"
         _ = generate_double_update_packet(data=data, target=target)
         if i % 100 == 0:
@@ -165,7 +161,6 @@ def calculate_generation_time_double():
 def process_double_packet(i):
     start = time.time()
 
-    data = os.urandom(1024)
     target = f"ECU_{i}"
     _ = generate_double_update_packet(data=data, target=target)
 
@@ -200,8 +195,6 @@ if __name__ == "__main__":
     plt.grid()
     plt.show()
     
-'''
     _ = calculate_generation_time_propose_parallel()
     _ = calculate_generation_time_base_parallel()
     _ = calculate_generation_time_double_parallel()
-'''
