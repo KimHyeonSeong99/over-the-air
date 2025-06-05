@@ -172,7 +172,6 @@ class ClusterWindow(QMainWindow):
 						else:
 							self.can.send(can.Message(arbitration_id=0x76, data=[0x11], is_extended_id=False))
 							self.ota_msg[256 * self.counter:] = []
-
 				elif can_id == 0x37:  # Check if the message is from the isotp stack
 					if self.ota_msg:
 						ids = max([seq for seq, _ in self.ota_msg[256 * self.counter:]])
@@ -180,13 +179,11 @@ class ClusterWindow(QMainWindow):
 							new_file = b"".join(data for _, data in sorted(self.ota_msg, key=lambda x: x[0]))
 							with open("firmware_received.bin", "wb") as f:
 								f.write(new_file)
-							self.can.send(can.Message(arbitration_id=0x76, data=[0x10], is_extended_id=False))
 							self.can.send(can.Message(arbitration_id=0x77, data=[0x10], is_extended_id=False))
 						else:
-							self.can.send(can.Message(arbitration_id=0x76, data=[0x11], is_extended_id=False))
+							self.can.send(can.Message(arbitration_id=0x77, data=[0x11], is_extended_id=False))
 							self.ota_msg[256 * self.counter:] = []
-					else:
-						self.can.send(can.Message(arbitration_id=0x77, data=[0x11], is_extended_id=False))
+
 
 		except Exception as e:
 			print(f"CAN receive error: {e}")  # Log any errors

@@ -32,6 +32,6 @@ def get_update():
     except FileNotFoundError:
         # 파일이 없으면 404 응답
         return "Update file not found", 404
-    
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
